@@ -2,12 +2,12 @@ const sql = require('mssql');
 require('dotenv').config();
 
 const config = {
-    user: "ebad1",
-    password: "ebad1",
-    server: "DESKTOP-JA3PT7Q",
-    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    database:process.env.DB_NAME,
     options: {
-        encrypt: false, // Set to true if using Azure SQL
+        encrypt: true, // Set to true if using Azure SQL
         trustServerCertificate: true // Change to false for production
     }
 };

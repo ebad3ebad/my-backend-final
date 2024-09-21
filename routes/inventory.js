@@ -36,7 +36,7 @@ router.get('/all', verifyToken, async (req, res) => {
 
         const request = new sql.Request(pool); // Use the pool for the request
 
-        const result = await request.query(`SELECT * FROM [Inventory]`);
+        const result = await request.query(`SELECT * FROM [Inventory] where active=1`);
 
         res.status(200).json(result.recordset);
     } catch (err) {
@@ -75,7 +75,7 @@ router.put('/update/:product_id', verifyToken, async (req, res) => {
 });
 
 // Delete an inventory item - Protected Route
-router.delete('/delete/:product_id', verifyToken, async (req, res) => {
+router.put('/delete/:product_id', verifyToken, async (req, res) => {
     const { product_id } = req.params;
 
     try {
@@ -86,7 +86,7 @@ router.delete('/delete/:product_id', verifyToken, async (req, res) => {
         request.input('product_id', sql.Int, product_id);
 
         await request.query(`
-            DELETE FROM [Inventory] WHERE product_id = @product_id
+            update Inventory set active=0 where product_id=@product_id
         `);
 
         res.status(200).json({ message: 'Inventory item deleted successfully' });
