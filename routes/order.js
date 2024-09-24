@@ -317,7 +317,7 @@ router.get('/receipt_other/:order_id', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error fetching receipt table' });
     }
 });
-
+///dasboard
 router.get('/dashboard', async (req, res) => {
     try {
         // Ensure a connection pool is available
@@ -331,7 +331,9 @@ router.get('/dashboard', async (req, res) => {
     (SELECT COUNT(DISTINCT order_id) FROM payment WHERE status <> 'completed') AS pending_orders,
     (SELECT COUNT(DISTINCT order_id) FROM payment WHERE status = 'completed') AS completed_orders,
     (SELECT COUNT(store_id) FROM medical_store WHERE active = 1) AS active_stores,
-    (SELECT COUNT(product_id) FROM inventory WHERE active = 1) AS active_products;
+    (SELECT COUNT(product_id) FROM inventory WHERE active = 1) AS active_products,
+    (select (sum(o.sell_price)-sum(i.purchase_price))profit from [dbo].[order] o left join inventory i on o.product_id=i.product_id) profit;
+
         `);
 
         // Send the results as a JSON response
@@ -340,6 +342,32 @@ router.get('/dashboard', async (req, res) => {
     } catch (err) {
         console.error('Error completed order :', err);
         res.status(500).json({ message: 'Error completed order' });
+    }
+});
+
+
+////particular order
+router.get('/order_detail/:order_id', verifyToken, async (req, res) => {
+
+    const { order_id } = req.params;
+    try {
+        // Ensure a connection pool is available
+        const pool = await connectToDatabase();
+        const request = new sql.Request(pool);
+
+        // Query to get all orders
+        const result = await request
+        .input('order_id', sql.Int,order_id)
+        .query(`
+            	select product_name,qty,unit,sell_price,O_bill from receipt_vu where order_id=@order_id 
+        `);
+
+        // Send the results as a JSON response
+        res.status(200).json(result.recordset);
+
+    } catch (err) {
+        console.error('Error P_order detail:', err);
+        res.status(500).json({ message: 'Error fetching P_order detail' });
     }
 });
 
