@@ -317,6 +317,8 @@ router.get('/receipt_other/:order_id', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error fetching receipt table' });
     }
 });
+
+
 ///dasboard
 router.get('/dashboard', async (req, res) => {
     try {
@@ -332,8 +334,9 @@ router.get('/dashboard', async (req, res) => {
     (SELECT COUNT(DISTINCT order_id) FROM payment WHERE status = 'completed') AS completed_orders,
     (SELECT COUNT(store_id) FROM medical_store WHERE active = 1) AS active_stores,
     (SELECT COUNT(product_id) FROM inventory WHERE active = 1) AS active_products,
-    (select (sum(o.sell_price)-sum(i.purchase_price))profit from [dbo].[order] o left join inventory i on o.product_id=i.product_id) profit;
-
+	(select round((sum(o.sell_price)-sum(i.purchase_price)),0)profit from [dbo].[order] o left join inventory i on o.product_id=i.product_id) profit,
+	(select sum(qty*purchase_price) from inventory where active=1) Total_Stock,
+	(select convert(DECIMAL(18, 2),(round(sum(balance),2))) from payment where status='pending') Balance;
         `);
 
         // Send the results as a JSON response
