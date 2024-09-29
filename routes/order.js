@@ -40,7 +40,7 @@ router.get('/suggestion', verifyToken, async (req, res) => {
         const result = await request
         .input('query', sql.VarChar, `%${query}%`) // Add wildcards directly here
         .query(
-          'SELECT product_id, product_name, qty, unit FROM inventory WHERE product_name LIKE @query and active=1'
+          'SELECT product_id, product_name, qty, unit,default_price FROM inventory WHERE product_name LIKE @query and active=1'
         );
       
       // Send the results as a JSON response
